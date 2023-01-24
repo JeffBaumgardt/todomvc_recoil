@@ -1,0 +1,5 @@
+/node_modules/
+/build/
+/coverage/
+/src/generated.graphql.ts
+/graphql.schema.json
