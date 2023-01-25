@@ -186,9 +186,10 @@ label.toggle-all-hide {
 .nav-buttons > * {
     padding: 2px 4px;
     border-radius: 3px;
+    border: 1px solid lightgray;
 }
 .active {
-    border: 1px solid gray;
+    border: 1px solid purple;
 }
 
 .all,

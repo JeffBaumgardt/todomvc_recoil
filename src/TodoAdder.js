@@ -1,34 +1,30 @@
 import React from 'react'
+import { useAddTodo } from './todosState'
 import './App.css'
 
-const TodoAdder = ({handleSubmit, toggleAll, todos}) => {
+const TodoAdder = () => {
     const [todo, setTodo] = React.useState('')
+    const addTodo = useAddTodo()
 
     const handleChange = e => {
         setTodo(e.target.value)
     }
 
-    const handleSubmitAndClear = () => {
-        handleSubmit({todo})
+    const handleKeyDown = (event) => {
+        if (event.key !== 'Enter') return
 
-        setTodo('')
-    }
+        const title = todo.trim()
 
-    const enteredEnter = event => {
-        if (event.keyCode === 13) {
-            event.preventDefault()
-            handleSubmitAndClear()
+        if (title) {
+            addTodo(title)
+            setTodo('')
         }
-    }
 
-    const toggleAllClass = todos.length > 0 ? 'toggle-all-button' : 'toggle-all-hide'
+        event.preventDefault()
+    }
 
     return (
         <form className="input">
-            <label className={toggleAllClass} onClick={toggleAll} style={{background: 'white'}}>
-                &#10003;
-            </label>
-
             <input
                 type="text"
                 className="new-todo"
@@ -36,7 +32,7 @@ const TodoAdder = ({handleSubmit, toggleAll, todos}) => {
                 name="todo"
                 onChange={handleChange}
                 value={todo}
-                onKeyDown={enteredEnter}
+                onKeyDown={handleKeyDown}
                 style={{background: 'white'}}
                 placeholder="What needs to be done?"
             />

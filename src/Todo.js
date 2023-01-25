@@ -1,50 +1,70 @@
 import React from 'react'
 
-const Todo = ({value, deleteEntry, completeTodo, id, handleEdit}) => {
-    const [isEditing, setIsEditing] = React.useState(false)
-    const [editValue, setEditValue] = React.useState(value.todo)
+const Todo = ({editing, todo, onCancel, onDelete, onEdit, onSave, onToggle}) => {
+    const [editValue, setEditValue] = React.useState(todo.title)
+
+    const handleSubmit = () => {
+        const text = editValue.trim()
+
+        if (text) {
+            onSave(text)
+            setEditValue(text)
+        } else {
+            onDelete(todo.id)
+        }
+    }
 
     const handleChange = event => {
         setEditValue(event.target.value)
     }
 
-    const handleEditInternal = () => {
-        handleEdit(editValue, id)
-        setIsEditing(false)
+    const handleEdit = () => {
+        onEdit()
+        setEditValue(todo.title)
     }
 
-    const enterEntered = event => {
-        if (event.key === 'Enter') {
-            handleEditInternal()
+    const handleKeyDown = event => {
+        if (event.key === 'Escape') {
+            setEditValue(todo.title)
+            onCancel()
+            return
+        } else if (event.key === 'Enter') {
+            handleSubmit()
         }
     }
 
-    const handleDoubleClick = () => {
-        setIsEditing(true)
-    }
-
-    let strikeOffStyle = value.completed
+    let strikeOffStyle = todo.completed
         ? {color: 'gray', textDecoration: 'line-through'}
         : {color: 'black', textDecoration: 'none'}
 
-    let status = value.completed ? <div style={{color: 'green'}}>&#10003;</div> : ''
+    let status = todo.completed ? <div style={{color: 'green'}}>&#10003;</div> : ''
 
-    if (!isEditing) {
+    if (!editing) {
         return (
             <div className="todo">
-                <div className="completeTodo" onClick={() => completeTodo(id)}>
+                <div className="completeTodo" onClick={() => onToggle(todo.id)}>
                     {status}
                 </div>
 
-                <span style={strikeOffStyle} className="todo-text" onDoubleClick={handleDoubleClick}>
-                    {value.todo}
+                <span style={strikeOffStyle} className="todo-text" onDoubleClick={handleEdit}>
+                    {todo.title}
                 </span>
-                <div className="edit-button" onClick={handleDoubleClick}>
+                <div className="edit-button" onClick={handleEdit}>
                     <i className="fa fa-pencil" aria-hidden="true"></i>
                 </div>
-                <div className="delete-todo" onClick={() => deleteEntry(id)}>
+                <div className="delete-todo" onClick={() => onDelete(todo.id)}>
                     &#10005;
                 </div>
+                {editing && (
+                    <input
+                        className="edit"
+                        aria-label={`Edit ${todo.title}`}
+                        value={editValue}
+                        onBlur={handleSubmit}
+                        onChange={handleChange}
+                        onKeyDown={handleKeyDown}
+                    />
+                )}
             </div>
         )
     } else {
@@ -56,8 +76,8 @@ const Todo = ({value, deleteEntry, completeTodo, id, handleEdit}) => {
                     value={editValue}
                     name="edit"
                     className="edit-input"
-                    onKeyDown={enterEntered}
-                    onBlur={handleEditInternal}
+                    onKeyDown={handleKeyDown}
+                    onBlur={handleEdit}
                     autoFocus
                 />
             </div>
